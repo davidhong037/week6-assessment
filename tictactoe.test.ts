@@ -5,7 +5,7 @@ const chromedriver = require('chromedriver')
 const driver = new Builder().withCapabilities(Capabilities.chrome()).build()
 
 beforeAll(async () => {
-    await driver.get('http://localhost:4000')
+    await driver.get('http://127.0.0.1:5500/tictacjs.html')
 })
 
 afterAll(async () => {
@@ -16,16 +16,41 @@ test('I can start a game', async () => {
 
     let button = await (await driver).findElement(By.id('start-game'));
     await button.click();
-
-    await driver.findElement(By.id('cell-0')).click()
-    await driver.sleep(1000)
-    await driver.findElement(By.id('cell-2')).click()
-    await driver.sleep(1000)
-    await driver.findElement(By.id('cell-8')).click()
-    await driver.sleep(1000)
-    // await driver.findElement(By.xpath("//[@id=cell-1]/table/tbody/tr/td[2]")).getText()
-    // await driver.sleep(1000)
-    await driver.findElement(By.id('cell-1')).getText()
-    await driver.sleep(1000)
-
 });
+
+describe('Clicking squares to check for Xs', async () => {
+test('Clicking upper left square to expect an X to the square', async () => {
+    const box = await driver.findElement(By.id('cell-0'))
+    await box.click()
+
+    expect(await box.getText()).toContain('X')
+    await driver.sleep(1000)
+})
+
+test('Clicking upper right square to expect an X to the square', async () => {
+    const box = await driver.findElement(By.id('cell-8'))
+    await box.click()
+
+    expect(await box.getText()).toContain('X')
+    await driver.sleep(1000)
+})
+
+test('Clicking lower right square to expect an X to the square', async () => {
+    const box = await driver.findElement(By.id('cell-2'))
+    await box.click()
+
+    expect(await box.getText()).toContain('X')
+    await driver.sleep(1000)
+})
+})
+
+test('Computer adds an O when you add an X', async() => {
+    await driver.navigate().refresh()
+    await (await driver).findElement(By.id('start-game')).click()
+
+    await driver.findElement(By.id('cell-1')).click()
+    const box = await driver.findElement(By.id('cell-0')).getText()
+
+    expect(box).toContain('O')
+    await driver.sleep(2000)
+})
